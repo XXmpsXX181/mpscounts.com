@@ -1,0 +1,40 @@
+import os
+from googleapiclient.discovery import build
+
+# Define your YouTube API key
+API_KEY = "YOUR_YOUTUBE_API_KEY"
+
+# Define the YouTube channel ID for the channel you want to fetch analytics for
+CHANNEL_ID = "YOUR_CHANNEL_ID"
+
+# Create a YouTube Data API client
+youtube = build("youtube", "v3", developerKey=API_KEY)
+
+def get_channel_analytics(channel_id):
+    try:
+        request = youtube.channels().list(
+            part="statistics",
+            id=channel_id
+        )
+        response = request.execute()
+        channel_data = response["items"][0]["statistics"]
+        return channel_data
+    except Exception as e:
+        print(f"An error occurred: {str(e)}")
+        return None
+
+def main():
+    channel_analytics = get_channel_analytics(CHANNEL_ID)
+    if channel_analytics is not None:
+        print("Channel Analytics:")
+        print(f"Subscriber Count: {channel_analytics['subscriberCount']}")
+        print(f"View Count: {channel_analytics['viewCount']}")
+        print(f"Video Count: {channel_analytics['videoCount']}")
+        print(f"Comment Count: {channel_analytics['commentCount']}")
+        print(f"Like Count: {channel_analytics['likeCount']}")
+        print(f"Dislike Count: {channel_analytics['dislikeCount']}")
+    else:
+        print("Unable to fetch channel analytics.")
+
+if __name__ == "__main__":
+    main()
