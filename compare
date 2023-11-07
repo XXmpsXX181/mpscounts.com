@@ -1,0 +1,50 @@
+import os
+import time
+from googleapiclient.discovery import build
+
+# Define your YouTube API key
+API_KEY = "YOUR_YOUTUBE_API_KEY"
+
+# Define the YouTube channel IDs for the channels you want to compare
+CHANNEL_ID_1 = "CHANNEL_ID_1"
+CHANNEL_ID_2 = "CHANNEL_ID_2"
+
+# Create a YouTube Data API client
+youtube = build("youtube", "v3", developerKey=API_KEY)
+
+def get_subscriber_count(channel_id):
+    try:
+        request = youtube.channels().list(
+            part="statistics",
+            id=channel_id
+        )
+        response = request.execute()
+        subscriber_count = int(response["items"][0]["statistics"]["subscriberCount"])
+        return subscriber_count
+    except Exception as e:
+        print(f"An error occurred: {str(e)}")
+        return None
+
+def compare_subscriber_counts(channel_id_1, channel_id_2):
+    subscriber_count_1 = get_subscriber_count(channel_id_1)
+    subscriber_count_2 = get_subscriber_count(channel_id_2)
+    
+    if subscriber_count_1 is not None and subscriber_count_2 is not None:
+        if subscriber_count_1 > subscriber_count_2:
+            print(f"Channel 1 has more subscribers: {subscriber_count_1} > {subscriber_count_2}")
+        elif subscriber_count_1 < subscriber_count_2:
+            print(f"Channel 2 has more subscribers: {subscriber_count_2} > {subscriber_count_1}")
+        else:
+            print(f"Both channels have the same number of subscribers: {subscriber_count_1}")
+    else:
+        print("Unable to fetch subscriber counts for one or both channels.")
+
+def main():
+    while True:
+        compare_subscriber_counts(CHANNEL_ID_1, CHANNEL_ID_2)
+        
+        # Refresh every 60 seconds (adjust as needed)
+        time.sleep(60)
+
+if __name__ == "__main__":
+    main()
