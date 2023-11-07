@@ -1,0 +1,39 @@
+import os
+import time
+from googleapiclient.discovery import build
+
+# Define your YouTube API key
+API_KEY = "YOUR_YOUTUBE_API_KEY"
+
+# Define the YouTube channel ID for the channel you want to track
+CHANNEL_ID = "YOUR_CHANNEL_ID"
+
+# Create a YouTube Data API client
+youtube = build("youtube", "v3", developerKey=API_KEY)
+
+def get_subscriber_count(channel_id):
+    try:
+        request = youtube.channels().list(
+            part="statistics",
+            id=channel_id
+        )
+        response = request.execute()
+        subscriber_count = int(response["items"][0]["statistics"]["subscriberCount"])
+        return subscriber_count
+    except Exception as e:
+        print(f"An error occurred: {str(e)}")
+        return None
+
+def main():
+    while True:
+        subscriber_count = get_subscriber_count(CHANNEL_ID)
+        if subscriber_count is not None:
+            print(f"Subscribers: {subscriber_count}")
+        else:
+            print("Unable to fetch subscriber count.")
+        
+        # Refresh every 2 seconds (adjust as needed)
+        time.sleep(2)
+
+if __name__ == "__main__":
+    main()
