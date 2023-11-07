@@ -1,0 +1,34 @@
+import os
+from googleapiclient.discovery import build
+
+# Define your YouTube API key
+API_KEY = "YOUR_YOUTUBE_API_KEY"
+
+# Define the YouTube video ID for the video you want to track
+VIDEO_ID = "YOUR_VIDEO_ID"
+
+# Create a YouTube Data API client
+youtube = build("youtube", "v3", developerKey=API_KEY)
+
+def get_total_view_count(video_id):
+    try:
+        request = youtube.videos().list(
+            part="statistics",
+            id=video_id
+        )
+        response = request.execute()
+        total_views = int(response["items"][0]["statistics"]["viewCount"])
+        return total_views
+    except Exception as e:
+        print(f"An error occurred: {str(e)}")
+        return None
+
+def main():
+    total_views = get_total_view_count(VIDEO_ID)
+    if total_views is not None:
+        print(f"Total Views: {total_views}")
+    else:
+        print("Unable to fetch total view count.")
+
+if __name__ == "__main__":
+    main()
